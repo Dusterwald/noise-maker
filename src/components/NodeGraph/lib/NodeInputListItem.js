@@ -1,47 +1,42 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export default class NodeInputListItem extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      hover: false
-    }
-  }
+export const NodeInputListItem = ({
+  onMouseUp,
+  index,
+  item
+}) => {
+  const [hover, setHover] = useState(false);
 
-  onMouseUp(e) {
+  const handleOnMouseUp = e => {
     e.stopPropagation();
-      e.preventDefault();
+    e.preventDefault();
 
-    this.props.onMouseUp(this.props.index);
+    onMouseUp(index);
   }
 
-  onMouseOver() {
-    this.setState({hover: true});
+  const onMouseOver = () => {
+    setHover(true);
   }
 
-  onMouseOut() {
-    this.setState({hover: false});
+  const onMouseOut = () => {
+    setHover(false);
   }
 
-  render() {
-    let {name} = this.props.item;
-    let {hover} = this.state;
-
-    const noop = (e) => {
-      e.stopPropagation();
-      e.preventDefault();
-    };
-
-    return (
-      <li>
-        <button onClick={e => noop(e)} onMouseUp={(e)=>this.onMouseUp(e)} type="button">
-          <i className={hover ? 'fa fa-circle-o hover' : 'fa fa-circle-o'}
-            onMouseOver={() => {this.onMouseOver()}}
-            onMouseOut={() => {this.onMouseOut()}}
-          ></i>
-          {name}
-        </button>
-      </li>
-    );
+  const noop = e => {
+    e.stopPropagation();
+    e.preventDefault();
   }
+
+  return (
+    <li>
+      <button onClick={noop} onMouseUp={handleOnMouseUp} type="button">
+        <i
+          className={hover ? 'fa fa-circle-o hover' : 'fa fa-circle-o'}
+          onMouseOver={onMouseOver}
+          onMouseOut={onMouseOut}
+        />
+        { item.name }
+      </button>
+    </li>
+  );
 }

@@ -1,82 +1,96 @@
-import React from 'react';
-import onClickOutside from 'react-onclickoutside';
+import React, { useState, useRef } from 'react';
 import Draggable from 'react-draggable';
-import NodeInputList from './NodeInputList';
-import NodeOuputList from './NodeOutputList';
+import useOnClickOutside from 'use-onclickoutside';
 
-class Node extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      selected: false
-    };
-  }
+import { NodeInputList } from './NodeInputList';
+import { NodeOutputList } from './NodeOutputList';
 
-  handleDragStart(event, ui) {
-    this.props.onNodeStart(this.props.nid, ui);
-  }
+const Node = ({
+  onNodeDeselect,
+  onNodeSelect,
+  onNodeStart,
+  onNodeStop,
+  onNodeMove,
+  onStartConnector,
+  onCompleteConnector,
+  index,
+  inputs,
+  outputs,
+  nid,
+  pos,
+  title
+}) => {
+  const [selected, setSelected] = useState(false);
 
-  handleDragStop(event, ui) {
-    this.props.onNodeStop(this.props.nid, ui.position);
-  }
+  // useEffect(() => {}, [selected]);
 
-  handleDrag(event, ui) {
-    this.props.onNodeMove(this.props.index, ui.position);
-  }
+  const handleDragStart = (eve, ui) => {
+    onNodeStart(nid, ui);
+  };
 
-  shouldComponentUpdate(nextProps, nextState) {
-    return this.state.selected !== nextState.selected;
-  }
+  const handleDragStop = (eve, ui) => {
+    onNodeStop(nid, {x: ui.x, y: ui.y});
+  };
 
-  onStartConnector(index) {
-    this.props.onStartConnector(this.props.nid, index);
-  }
+  const handleDrag = (eve, ui) => {
+    // console.log(ui);
+    onNodeMove(index, {x: ui.x, y: ui.y});
+  };
 
-  onCompleteConnector(index) {
-    this.props.onCompleteConnector(this.props.nid, index);
-  }
+  const handleOnStartConnector = idx => {
+    onStartConnector(nid, idx);
+  };
 
-  handleClick(e) {
-    this.setState({selected: true});
-    if (this.props.onNodeSelect) {
-      this.props.onNodeSelect(this.props.nid);
+  const handleOnCompleteConnector = idx => {
+    onCompleteConnector(nid, idx);
+  };
+
+  const handleClick = e => {
+    setSelected(true);
+    if (onNodeSelect) {
+      onNodeSelect(nid);
     }
-  }
+  };
 
-  handleClickOutside() {
-    let {selected} = this.state;
-    if (this.props.onNodeDeselect && selected) {
-      this.props.onNodeDeselect(this.props.nid);
+  const handleClickOutside = () => {
+    if (onNodeDeselect && selected) {
+      onNodeDeselect(nid);
     }
-    this.setState({selected: false});
-  }
+    setSelected(false);
+  };
 
-	render() {
-    let {selected} = this.state;
+  const ref = useRef(null);
+  useOnClickOutside(ref, handleClickOutside);
 
-    let nodeClass = 'node' + (selected ? ' selected' : '');
+  const nodeClass = `node ${selected ? ' selected' : ''}`;
 
-		return (
-		  <div onDoubleClick={(e) => {this.handleClick(e)}}>
-        <Draggable
-          start={{x:this.props.pos.x,y:this.props.pos.y}}
-          handle=".node-header"
-          onStart={(event, ui)=>this.handleDragStart(event, ui)}
-          onStop={(event, ui)=>this.handleDragStop(event, ui)}
-          onDrag={(event, ui)=>this.handleDrag(event, ui)}>
-        <section className={nodeClass} style={{zIndex:10000}}>
-            <header className="node-header">
-              <span className="node-title">{this.props.title}</span>
-            </header>
-            <div className="node-content">
-              <NodeInputList items={this.props.inputs} onCompleteConnector={(index)=>this.onCompleteConnector(index)} />
-              <NodeOuputList items={this.props.outputs} onStartConnector={(index)=>this.onStartConnector(index)} />
-            </div>
+  return (
+    <div onDoubleClick={(e) => handleClick(e)} ref={ref}>
+      <Draggable
+        position={{ x: pos.x, y: pos.y }}
+        handle=".node-header"
+        onStart={(eve, ui) => handleDragStart(eve, ui)}
+        onStop={(eve, ui) => handleDragStop(eve, ui)}
+        onDrag={(eve, ui) => handleDrag(eve, ui)}
+      >
+        <section className={nodeClass} style={{ zIndex: 10000 }}>
+          <header className="node-header">
+            <span className="node-title">{title}</span>
+          </header>
+          <div className="node-content">
+            <NodeInputList
+              items={inputs}
+              onCompleteConnector={(idx) => handleOnCompleteConnector(idx)}
+            />
+            <NodeOutputList
+              items={outputs}
+              onStartConnector={(idx) => handleOnStartConnector(idx)}
+            />
+          </div>
         </section>
-        </Draggable>
-      </div>
-    );
-	}
-}
+      </Draggable>
+    </div>
+  );
+};
 
-export default onClickOutside(Node);
+export default Node;

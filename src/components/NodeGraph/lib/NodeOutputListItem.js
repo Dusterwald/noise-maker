@@ -1,24 +1,28 @@
 import React from 'react';
 
-export default class NodeOutputListItem extends React.Component {
-  
-  onMouseDown(e) {
+export const NodeOutputListItem = ({
+  onMouseDown,
+  index,
+  item
+}) => {
+  const handleOnMouseDown = e => {
     e.stopPropagation();
-      e.preventDefault();
+    e.preventDefault();
 
-    this.props.onMouseDown(this.props.index);
+    onMouseDown(index);
   }
 
-  noop(e) {
+  const noop = e => {
     e.stopPropagation();
     e.preventDefault();
   }
 
-  render() {
-    return (
-      <li onMouseDown={(e)=>this.onMouseDown(e)}>
-        <button type="button" onClick={(e)=>this.noop(e)}>{this.props.item.name} <i className="fa fa-circle-o"></i></button>
-      </li>
-    );
-  }
+  return (
+        <li onMouseDown={handleOnMouseDown}>
+            <button type="button" onClick={noop}>
+                { item.name }
+                <i className={"fa fa-circle-o"}></i>
+            </button>
+        </li>
+  )
 }

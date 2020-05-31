@@ -1,26 +1,28 @@
 import React from 'react';
 
-import NodeOutputListItem from './NodeOutputListItem';
+import { NodeOutputListItem } from './NodeOutputListItem';
 
-export default class NodeOutputList extends React.Component {
+export const NodeOutputList = ({
+    onStartConnector,
+    items
+}) => {
+    const onMouseDown = i => {
+        onStartConnector(i);
+    }
 
-	onMouseDown(i) {
-		this.props.onStartConnector(i);
-	}
+    let i = 0;
 
-	render() {
-		let i = 0;
-
-		return (
-			<div className="nodeOutputWrapper">
-			    <ul className="nodeOutputList">
-					{this.props.items.map((item) => {
-						return (
-							<NodeOutputListItem onMouseDown={(i)=>this.onMouseDown(i)} key={i} index={i++} item={item} />
-						)
-					})}
-				</ul>
-			</div>
-		);
-	}
+    return (
+        <div className={"nodeOutputWrapper"}>
+            <ul className={"nodeOutputList"}>
+                {items.map(item => {
+                    return <NodeOutputListItem 
+                                onMouseDown={i => onMouseDown(i)}
+                                key={i}
+                                index={i++}
+                                item={item} />
+                })}
+            </ul>
+        </div>
+    );
 }
