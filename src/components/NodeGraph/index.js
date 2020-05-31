@@ -98,7 +98,7 @@ const NodeGraph = ({
     if (onNodeDeselect) {
       onNodeDeselect(nid);
     }
-  }
+  };
 
   const computePinIdxfromLabel = (pins, pinLabel) => {
     let reval = 0;
@@ -106,11 +106,12 @@ const NodeGraph = ({
     for (let pin of pins) {
       if (pin.name === pinLabel) {
         return reval;
-      } else {
-        reval++;
       }
+      reval++;
     }
-  }
+
+    return reval;
+  };
 
   const getNodeById = (nodes, nid) => {
     let reval = 0;
@@ -118,11 +119,12 @@ const NodeGraph = ({
     for(const node of nodes) {
       if (node.nid === nid) {
         return nodes[reval];
-      } else {
-        reval++;
       }
+      reval++;
     }
-  }
+
+    return reval;
+  };
 
   let newConn = null;
   let i = 0;
@@ -138,62 +140,76 @@ const NodeGraph = ({
 
     // console.log(mousePos);
     newConn = <Spline
-                    start={connectorStart}
-                    end={connectorEnd}
+      start={connectorStart}
+      end={connectorEnd}
                   />
   }
 
   let splineIdx = 0;
 
   return (
-        <div className={dragging ? 'dragging' : ''} 
-              onMouseMove={onMouseMove}
-              onMouseUp={onMouseUp}
-        >
-            {dataS.nodes.map(node => {
-              // console.log(node);
-              return <DragNode
-                            index={i++}
-                            nid={node.nid}
-                            title={node.type}
-                            inputs={node.fields.in}
-                            outputs={node.fields.out}
-                            pos={{x: node.x, y: node.y}}
-                            key={node.nid}
+    <div
+      className={dragging ? 'dragging' : ''}
+      onMouseMove={onMouseMove}
+      onMouseUp={onMouseUp}
+    >
+      {dataS.nodes.map((node) => {
+        // console.log(node);
+        return (
+          <DragNode
+            index={i++}
+            nid={node.nid}
+            title={node.type}
+            inputs={node.fields.in}
+            outputs={node.fields.out}
+            pos={{x: node.x, y: node.y}}
+            key={node.nid}
 
-                            onNodeStart={nid => handleNodeStart(nid)}
-                            onNodeStop={(nid, pos) => handleNodeStop(nid, pos)}
-                            onNodeMove={(idx, pos) => handleNodeMove(idx, pos)}
+            onNodeStart={nid => handleNodeStart(nid)}
+            onNodeStop={(nid, pos) => handleNodeStop(nid, pos)}
+            onNodeMove={(idx, pos) => handleNodeMove(idx, pos)}
 
-                            onStartConnector={(nid, outputIdx) => handleStartConnector(nid, outputIdx)}
-                            onCompleteConnector={(nid, inputIdx) => handleCompleteConnector(nid, inputIdx)}
+            onStartConnector={(nid, outputIdx) => handleStartConnector(nid, outputIdx)}
+            onCompleteConnector={(nid, inputIdx) => handleCompleteConnector(nid, inputIdx)}
 
-                            onNodeSelect={nid => handleNodeSelect(nid)}
-                            onNodeDeselect={nid => handleNodeDeselect(nid)}
-                       />
-            })}
-            <svg style={{position: 'absolute', height: "100%", width: "100%", zIndex: 9000}} 
-                 ref={svgRef}>
-                {data.connections.map(connector => {
-                  // console.log(data);
-                  // console.log(connector);
-                  let fromNode = getNodeById(data.nodes, connector.from_node);
-                  let toNode = getNodeById(data.nodes, connector.to_node);
+            onNodeSelect={nid => handleNodeSelect(nid)}
+            onNodeDeselect={nid => handleNodeDeselect(nid)}
+          />
+        );
+      })}
+      <svg
+        style={{
+          position: 'absolute',
+          height: '100%',
+          width: '100%',
+          zIndex: 9000,
+          top: 0,
+          left: 0
+        }}
+        ref={svgRef}
+      >
+        {data.connections.map(connector => {
+          // console.log(data);
+          // console.log(connector);
+          const fromNode = getNodeById(data.nodes, connector.from_node);
+          const toNode = getNodeById(data.nodes, connector.to_node);
 
-                  let splinestart = computeOutOffsetByIndex(fromNode.x, fromNode.y, computePinIdxfromLabel(fromNode.fields.out, connector.from));
-                  let splineend = computeInOffsetByIndex(toNode.x, toNode.y, computePinIdxfromLabel(toNode.fields.in, connector.to));
+          const splinestart = computeOutOffsetByIndex(fromNode.x, fromNode.y, computePinIdxfromLabel(fromNode.fields.out, connector.from));
+          const splineend = computeInOffsetByIndex(toNode.x, toNode.y, computePinIdxfromLabel(toNode.fields.in, connector.to));
 
-                  return <Spline
-                            start={splinestart}
-                            end={splineend}
-                            key={splineIdx++}
-                            mousePos={mousePos}
-                            onRemove={() => handleRemoveConnector(connector)}
-                    />
-                })}
-                {newConn}
-            </svg>
-        </div>
+          return (
+            <Spline
+              start={splinestart}
+              end={splineend}
+              key={splineIdx++}
+              mousePos={mousePos}
+              onRemove={() => handleRemoveConnector(connector)}
+            />
+          );
+        })}
+        {newConn}
+      </svg>
+    </div>
   );
 };
 

@@ -64,6 +64,8 @@ const Node = ({
 
   const nodeClass = `node ${selected ? ' selected' : ''}`;
 
+  const nodeRef = useRef(null);
+
   return (
     <div onDoubleClick={(e) => handleClick(e)} ref={ref}>
       <Draggable
@@ -72,8 +74,9 @@ const Node = ({
         onStart={(eve, ui) => handleDragStart(eve, ui)}
         onStop={(eve, ui) => handleDragStop(eve, ui)}
         onDrag={(eve, ui) => handleDrag(eve, ui)}
+        nodeRef={nodeRef}
       >
-        <section className={nodeClass} style={{ zIndex: 10000 }}>
+        <section className={nodeClass} style={{ zIndex: 10000 }} ref={nodeRef}>
           <header className="node-header">
             <span className="node-title">{title}</span>
           </header>

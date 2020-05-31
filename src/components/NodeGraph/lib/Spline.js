@@ -16,13 +16,13 @@ const Spline = ({
 
   const bezierCurve = (a, b, cp1x, cp1y, cp2x, cp2y, x, y) => {
     return `M ${a} ${b} C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${x} ${y}`;
-  }
+  };
 
   const distance = (a, b) => {
     return Math.sqrt(
       (b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1])
-    )
-  }
+    );
+  };
 
   const handleClick = e => {
     setSelected(old => !old);
