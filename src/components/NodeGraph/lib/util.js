@@ -1,7 +1,7 @@
 /* not bound to style, should be computed */
 
 export function computeInOffsetByIndex(x, y, index) {
-  const outx = x + 17;
+  const outx = x + 20;
   //const outy = y + 47 + (index * 20);
   const outy = y + 5 + (index * 20);
 
@@ -9,7 +9,7 @@ export function computeInOffsetByIndex(x, y, index) {
 }
 
 export function computeOutOffsetByIndex(x, y, index) {
-  const outx = x + 166;
+  const outx = x + 160;
   //const outy = y + 49 + (index * 22);
   const outy = y + 28 + (index * 22);
 

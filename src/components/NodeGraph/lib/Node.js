@@ -29,23 +29,23 @@ const Node = ({
   };
 
   const handleDragStop = (eve, ui) => {
-    onNodeStop(nid, {x: ui.x, y: ui.y});
+    onNodeStop(nid, { x: ui.x, y: ui.y });
   };
 
   const handleDrag = (eve, ui) => {
     // console.log(ui);
-    onNodeMove(index, {x: ui.x, y: ui.y});
+    onNodeMove(index, { x: ui.x, y: ui.y });
   };
 
-  const handleOnStartConnector = idx => {
+  const handleOnStartConnector = (idx) => {
     onStartConnector(nid, idx);
   };
 
-  const handleOnCompleteConnector = idx => {
+  const handleOnCompleteConnector = (idx) => {
     onCompleteConnector(nid, idx);
   };
 
-  const handleClick = e => {
+  const handleClick = () => {
     setSelected(true);
     if (onNodeSelect) {
       onNodeSelect(nid);

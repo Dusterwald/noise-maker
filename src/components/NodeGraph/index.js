@@ -1,6 +1,5 @@
 import React, { useState, useRef } from 'react';
 import { computeOutOffsetByIndex, computeInOffsetByIndex } from './lib/util';
-// import { SVGComponent } from './lib-hooks/svgComp-hooks';
 import Spline from './lib/Spline';
 import DragNode from './lib/Node';
 import './node.css';
@@ -17,87 +16,83 @@ const NodeGraph = ({
   const [dataS, setDataS] = useState(data);
   const [source, setSource] = useState([]);
   const [dragging, setDragging] = useState(false);
-  const [mousePos, setMousePos] = useState({x: 0, y: 0});
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
 
   const svgRef = useRef();
 
   const onMouseMove = e => {
-    let [pX, pY] = [e.clientX, e.clientY];
+    const [pX, pY] = [e.clientX, e.clientY];
     e.stopPropagation();
     e.preventDefault();
 
     const svgRect = svgRef.current.getBoundingClientRect();
     // console.log(svgRect);
-    setMousePos(old => {
-      return {
-        ...old,
-        ...{x: pX - svgRect.left, y: pY - svgRect.top}
-      }
-    });
-  }
+    setMousePos((old) => ({
+      ...old,
+      ...{ x: pX - svgRect.left, y: pY - svgRect.top }
+    }));
+  };
 
-  const onMouseUp = e => {
+  const onMouseUp = () => {
     setDragging(false);
-  }
+  };
 
-  const handleNodeStart = nid => {
-    onNodeStartMove(nid);
-  }
+  const handleNodeStart = (nid) => {
+    // eslint-disable-next-line no-unused-expressions
+    onNodeStartMove?.(nid);
+  };
 
   const handleNodeStop = (nid, pos) => {
-    onNodeMove(nid, pos);
-  }
+    // eslint-disable-next-line no-unused-expressions
+    onNodeMove?.(nid, pos);
+  };
 
   const handleNodeMove = (idx, pos) => {
-    let dataT = dataS;
+    const dataT = dataS;
     dataT.nodes[idx].x = pos.x;
     dataT.nodes[idx].y = pos.y;
 
     // console.log(dataT);
     // console.log({...dataS,...dataT});
-    setDataS(old => {
-      return {
-        ...old, 
-        ...dataT
-      }
-    });
-  }
+    setDataS((old) => ({
+      ...old,
+      ...dataT
+    }));
+  };
 
   const handleStartConnector = (nid, outputIdx) => {
     let newSrc = [nid, outputIdx];
 
     setDragging(true);
     setSource(newSrc); // Not sure if this will work...
-  }
+  };
 
   const handleCompleteConnector = (nid, inputIdx) => {
     if (dragging) {
-      let fromNode = getNodeById(data.nodes, source[0]);
-      let fromPinName = fromNode.fields.out[source[1]].name;
-      let toNode = getNodeById(data.nodes, nid);
-      let toPinName = toNode.fields.in[inputIdx].name;
+      const fromNode = getNodeById(data.nodes, source[0]);
+      const fromPinName = fromNode.fields.out[source[1]].name;
+      const toNode = getNodeById(data.nodes, nid);
+      const toPinName = toNode.fields.in[inputIdx].name;
 
-      onNewConnector(fromNode.nid, fromPinName, toNode.nid, toPinName);
+      // eslint-disable-next-line no-unused-expressions
+      onNewConnector?.(fromNode.nid, fromPinName, toNode.nid, toPinName);
     }
     setDragging(false);
-  }
+  };
 
-  const handleRemoveConnector = connector => {
-    if (onRemoveConnector) {
-      onRemoveConnector(connector);
-    }
-  }
+  const handleRemoveConnector = (connector) => {
+    // eslint-disable-next-line no-unused-expressions
+    onRemoveConnector?.(connector);
+  };
 
-  const handleNodeSelect = nid => {
-    if (onNodeSelect) {
-      onNodeSelect(nid);
-    }
-  }
+  const handleNodeSelect = (nid) => {
+    // eslint-disable-next-line no-unused-expressions
+    onNodeSelect?.(nid);
+  };
 
-  const handleNodeDeselect = nid => {
-    if (onNodeDeselect) {
-      onNodeDeselect(nid);
-    }
+  const handleNodeDeselect = (nid) => {
+    // eslint-disable-next-line no-unused-expressions
+    onNodeDeselect?.(nid);
   };
 
   const computePinIdxfromLabel = (pins, pinLabel) => {
@@ -131,18 +126,20 @@ const NodeGraph = ({
 
   // console.log(dragging);
   if (dragging) {
-    let sourceNode = getNodeById(dataS.nodes, source[0]);
-    let connectorStart = computeOutOffsetByIndex(sourceNode.x, sourceNode.y, source[1]);
-    let connectorEnd = {
+    const sourceNode = getNodeById(dataS.nodes, source[0]);
+    const connectorStart = computeOutOffsetByIndex(sourceNode.x, sourceNode.y, source[1]);
+    const connectorEnd = {
       x: mousePos.x,
       y: mousePos.y
     };
 
     // console.log(mousePos);
-    newConn = <Spline
-      start={connectorStart}
-      end={connectorEnd}
-                  />
+    newConn = (
+      <Spline
+        start={connectorStart}
+        end={connectorEnd}
+      />
+    );
   }
 
   let splineIdx = 0;
@@ -165,15 +162,15 @@ const NodeGraph = ({
             pos={{x: node.x, y: node.y}}
             key={node.nid}
 
-            onNodeStart={nid => handleNodeStart(nid)}
+            onNodeStart={(nid) => handleNodeStart(nid)}
             onNodeStop={(nid, pos) => handleNodeStop(nid, pos)}
             onNodeMove={(idx, pos) => handleNodeMove(idx, pos)}
 
             onStartConnector={(nid, outputIdx) => handleStartConnector(nid, outputIdx)}
             onCompleteConnector={(nid, inputIdx) => handleCompleteConnector(nid, inputIdx)}
 
-            onNodeSelect={nid => handleNodeSelect(nid)}
-            onNodeDeselect={nid => handleNodeDeselect(nid)}
+            onNodeSelect={(nid) => handleNodeSelect(nid)}
+            onNodeDeselect={(nid) => handleNodeDeselect(nid)}
           />
         );
       })}
@@ -188,7 +185,7 @@ const NodeGraph = ({
         }}
         ref={svgRef}
       >
-        {data.connections.map(connector => {
+        {data.connections.map((connector) => {
           // console.log(data);
           // console.log(connector);
           const fromNode = getNodeById(data.nodes, connector.from_node);

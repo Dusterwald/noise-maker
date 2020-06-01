@@ -22,10 +22,10 @@ const App = () => {
     ]
   };
 
-  const onNodeMove = (nid, pos) => {};
+  /* const onNodeMove = (nid, pos) => {};
   const onNodeStartMove = (nid) => {};
   const onNewConnector = (n1, o, n2, i) => {};
-  const onRemoveConnector = (connector) => {};
+  const onRemoveConnector = (connector) => {}; */
 
   /* return (
     <div className="App">
@@ -44,10 +44,10 @@ const App = () => {
     <div className="App">
       <NodeGraph
         data={exampleGraph}
-        onNodeMove={(nid, pos) => onNodeMove(nid, pos)}
+        /* onNodeMove={(nid, pos) => onNodeMove(nid, pos)}
         onNodeStartMove={(nid) => onNodeStartMove(nid)}
         onNewConnector={(n1, o, n2, i) => onNewConnector(n1, o, n2, i)}
-        onRemoveConnector={(connector) => onRemoveConnector(connector)}
+        onRemoveConnector={(connector) => onRemoveConnector(connector)} */
       />
     </div>
   );
