@@ -43,7 +43,8 @@ body {
 }
 
 .node-title {
-  font-size:10px;
+  font-size: 10px;
+  text-shadow: 1px 1px 5px #000000b7;
 }
 
 .node-header {

@@ -20,7 +20,11 @@ const NodeGraph = ({
 
   const svgRef = useRef();
 
-  const onMouseMove = e => {
+  const computePinIdxfromLabel = (pins, pinLabel) => pins.findIndex((x) => x.name === pinLabel);
+
+  const getNodeById = (nodes, nid) => nodes.find((x) => x.nid === nid);
+
+  const onMouseMove = (e) => {
     const [pX, pY] = [e.clientX, e.clientY];
     e.stopPropagation();
     e.preventDefault();
@@ -61,7 +65,7 @@ const NodeGraph = ({
   };
 
   const handleStartConnector = (nid, outputIdx) => {
-    let newSrc = [nid, outputIdx];
+    const newSrc = [nid, outputIdx];
 
     setDragging(true);
     setSource(newSrc); // Not sure if this will work...
@@ -95,32 +99,6 @@ const NodeGraph = ({
     onNodeDeselect?.(nid);
   };
 
-  const computePinIdxfromLabel = (pins, pinLabel) => {
-    let reval = 0;
-
-    for (let pin of pins) {
-      if (pin.name === pinLabel) {
-        return reval;
-      }
-      reval++;
-    }
-
-    return reval;
-  };
-
-  const getNodeById = (nodes, nid) => {
-    let reval = 0;
-
-    for(const node of nodes) {
-      if (node.nid === nid) {
-        return nodes[reval];
-      }
-      reval++;
-    }
-
-    return reval;
-  };
-
   let newConn = null;
   let i = 0;
 
@@ -150,30 +128,27 @@ const NodeGraph = ({
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
     >
-      {dataS.nodes.map((node) => {
-        // console.log(node);
-        return (
-          <DragNode
-            index={i++}
-            nid={node.nid}
-            title={node.type}
-            inputs={node.fields.in}
-            outputs={node.fields.out}
-            pos={{x: node.x, y: node.y}}
-            key={node.nid}
+      {dataS.nodes.map((node) => (
+        <DragNode
+          index={i++}
+          nid={node.nid}
+          title={node.type}
+          inputs={node.fields.in}
+          outputs={node.fields.out}
+          pos={{ x: node.x, y: node.y }}
+          key={node.nid}
 
-            onNodeStart={(nid) => handleNodeStart(nid)}
-            onNodeStop={(nid, pos) => handleNodeStop(nid, pos)}
-            onNodeMove={(idx, pos) => handleNodeMove(idx, pos)}
+          onNodeStart={(nid) => handleNodeStart(nid)}
+          onNodeStop={(nid, pos) => handleNodeStop(nid, pos)}
+          onNodeMove={(idx, pos) => handleNodeMove(idx, pos)}
 
-            onStartConnector={(nid, outputIdx) => handleStartConnector(nid, outputIdx)}
-            onCompleteConnector={(nid, inputIdx) => handleCompleteConnector(nid, inputIdx)}
+          onStartConnector={(nid, outputIdx) => handleStartConnector(nid, outputIdx)}
+          onCompleteConnector={(nid, inputIdx) => handleCompleteConnector(nid, inputIdx)}
 
-            onNodeSelect={(nid) => handleNodeSelect(nid)}
-            onNodeDeselect={(nid) => handleNodeDeselect(nid)}
-          />
-        );
-      })}
+          onNodeSelect={(nid) => handleNodeSelect(nid)}
+          onNodeDeselect={(nid) => handleNodeDeselect(nid)}
+        />
+      ))}
       <svg
         style={{
           position: 'absolute',

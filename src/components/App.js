@@ -4,22 +4,16 @@ import './App.css';
 
 const App = () => {
   const exampleGraph = {
-    nodes: [
-      {
-        nid: 0, type: 'Timer', x: 89, y: 82, fields: { in: [{ name: 'reset' }, { name: 'pause' }, { name: 'max' }], out: [{ name: 'out' }] }
-      },
-      {
-        nid: 1, type: 'MathMult', x: 284, y: 82, fields: { in: [{ name: 'in' }, { name: 'factor' }], out: [{ name: 'out' }] }
-      },
-      {
-        nid: 2, type: 'Vector3', x: 486, y: 188, fields: { in: [{ name: 'xyz' }, { name: 'x' }, { name: 'y' }, { name: 'z' }], out: [{ name: 'xyz' }, { name: 'x' }, { name: 'y' }, { name: 'z' }] }
-      }
-    ],
-    connections: [
-      {
-        from_node: 0, from: 'field_name', to_node: 1, to: 'field_name'
-      }
-    ]
+    nodes: [{
+      nid: 0, type: 'Perlin', x: 89, y: 82, fields: { in: [{ name: 'reset' }, { name: 'pause' }, { name: 'max' }], out: [{ name: 'out' }] }
+    }, {
+      nid: 1, type: 'MathMult', x: 284, y: 82, fields: { in: [{ name: 'in' }, { name: 'factor' }], out: [{ name: 'out' }] }
+    }, {
+      nid: 2, type: 'Billow', x: 486, y: 188, fields: { in: [{ name: 'xyz' }, { name: 'x' }, { name: 'y' }, { name: 'z' }], out: [{ name: 'xyz' }, { name: 'x' }, { name: 'y' }, { name: 'z' }] }
+    }],
+    connections: [{
+      from_node: 0, from: 'field_name', to_node: 1, to: 'field_name'
+    }]
   };
 
   /* const onNodeMove = (nid, pos) => {};

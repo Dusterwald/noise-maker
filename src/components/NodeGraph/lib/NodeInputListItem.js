@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/mouse-events-have-key-events */
 import React, { useState } from 'react';
 
 export const NodeInputListItem = ({
@@ -7,25 +8,25 @@ export const NodeInputListItem = ({
 }) => {
   const [hover, setHover] = useState(false);
 
-  const handleOnMouseUp = e => {
+  const handleOnMouseUp = (e) => {
     e.stopPropagation();
     e.preventDefault();
 
     onMouseUp(index);
-  }
+  };
 
   const onMouseOver = () => {
     setHover(true);
-  }
+  };
 
   const onMouseOut = () => {
     setHover(false);
-  }
+  };
 
-  const noop = e => {
+  const noop = (e) => {
     e.stopPropagation();
     e.preventDefault();
-  }
+  };
 
   return (
     <li>
@@ -39,4 +40,4 @@ export const NodeInputListItem = ({
       </button>
     </li>
   );
-}
+};

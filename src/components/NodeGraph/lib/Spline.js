@@ -14,28 +14,22 @@ const Spline = ({
   const [selected, setSelected] = useState(false);
   const [position, setPosition] = useState({ x: 0, y: 0 });
 
-  const bezierCurve = (a, b, cp1x, cp1y, cp2x, cp2y, x, y) => {
-    return `M ${a} ${b} C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${x} ${y}`;
-  };
+  const bezierCurve = (a, b, cp1x, cp1y, cp2x, cp2y, x, y) => `M ${a} ${b} C ${cp1x} ${cp1y} ${cp2x} ${cp2y} ${x} ${y}`;
 
-  const distance = (a, b) => {
-    return Math.sqrt(
-      (b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1])
-    );
-  };
+  const distance = (a, b) => Math.sqrt(
+    (b[0] - a[0]) * (b[0] - a[0]) + (b[1] - a[1]) * (b[1] - a[1])
+  );
 
-  const handleClick = e => {
-    setSelected(old => !old);
-    setPosition(old => {
-      return {...old, ...mousePos}
-    });
+  const handleClick = (e) => {
+    setSelected((old) => !old);
+    setPosition((old) => ({ ...old, ...mousePos }));
 
     if (onClick) {
       onClick(e);
     }
   };
 
-  const handleClickOutside = e => {
+  const handleClickOutside = (e) => {
     setSelected(false);
 
     if (onClickOutside) {
@@ -46,7 +40,7 @@ const Spline = ({
   const ref = useRef(null);
   useOnClickOutside(ref, handleClickOutside);
 
-  const handleRemove = e => {
+  const handleRemove = (e) => {
     setSelected(false);
 
     if (onRemove) {
@@ -54,10 +48,11 @@ const Spline = ({
     }
   };
 
-  let dist = distance(
+  const dist = distance(
     [start.x, start.y],
-    [end.x, end.y]);
-  let pathString = bezierCurve(start.x,
+    [end.x, end.y]
+  );
+  const pathString = bezierCurve(start.x,
     start.y,
     start.x + dist * 0.25,
     start.y,
@@ -65,17 +60,17 @@ const Spline = ({
     end.y,
     end.x,
     end.y);
-  let className = `connector ${selected ? ' selected' : ''}`;
+  const className = `connector ${selected ? ' selected' : ''}`;
 
   return (
     <g ref={ref}>
-      <circle cx={start.x} cy={start.y} r={"3"} fill={"#337ab7"} />
-      <circle cx={end.x} cy={end.y} r={"3"} fill={"#9191A8"} />
-      <path className={"connector-click-area"} d={pathString} onClick={handleClick} />
+      <circle cx={start.x} cy={start.y} r="3" fill="#337ab7" />
+      <circle cx={end.x} cy={end.y} r="3" fill="#9191A8" />
+      <path className="connector-click-area" d={pathString} onClick={handleClick} />
       <path className={className} d={pathString} onClick={handleClick} />
       { selected
         ? (
-          <TrashIcon 
+          <TrashIcon
             position={position}
             onClick={handleRemove}
           />

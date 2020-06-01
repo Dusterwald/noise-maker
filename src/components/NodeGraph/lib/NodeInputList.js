@@ -9,6 +9,7 @@ export const NodeInputList = ({
   const onMouseUp = (i) => {
     onCompleteConnector(i);
   };
+  console.log(items);
 
   let i = 0;
   return (
