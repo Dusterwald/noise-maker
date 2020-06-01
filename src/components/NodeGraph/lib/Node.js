@@ -1,7 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import Draggable from 'react-draggable';
 import useOnClickOutside from 'use-onclickoutside';
-import { Perlin } from 'libnoise-ts/module/generator';
 
 import { NodeInputList } from './NodeInputList';
 import { NodeOutputList } from './NodeOutputList';
@@ -19,7 +18,9 @@ const Node = ({
   outputs,
   nid,
   pos,
-  title
+  connections,
+  title,
+  module
 }) => {
   const [selected, setSelected] = useState(false);
 
@@ -67,25 +68,19 @@ const Node = ({
 
   const nodeRef = useRef(null);
 
+  const hasImageModule = typeof module?.getValue === 'function';
   const canvasRef = useRef(null);
 
   useEffect(() => {
-    if (canvasRef) {
+    if (canvasRef && hasImageModule) {
       const ctx = canvasRef.current.getContext('2d');
 
-      const perlin1 = new Perlin(0.25, 2.0, 4, 0.5, Math.random() * Number.MAX_SAFE_INTEGER);
-
       const arr = new Uint8ClampedArray(128 * 128 * 4);
-      /* for (let i = 0; i < (128 * 128 * 4); i += 4) {
-        arr[i + 0] = 255;
-        arr[i + 1] = 0;
-        arr[i + 2] = 0;
-        arr[i + 3] = 255;
-      } */
+
       for (let x = 0; x < 128; x++) {
         for (let y = 0; y < 128; y++) {
           const i = ((y * 128) + x) * 4;
-          const v = ((perlin1.getValue(x, y, 0) + 1.0) / 2.0) * 255;
+          const v = ((module.getValue(x, y, 0) + 1.0) / 2.0) * 255;
           arr[i] = v;
           arr[i + 1] = v;
           arr[i + 2] = v;
@@ -96,7 +91,34 @@ const Node = ({
       const imageData = new ImageData(arr, 128, 128);
       ctx.putImageData(imageData, 0, 0);
     }
-  }, []);
+  }, [hasImageModule, module]);
+
+  // console.log(connections);
+  const cons = connections.filter((c) => c.to_node === nid);
+  const processedInputs = inputs.map((i) => {
+    // Find if any inputs match this one:
+    if (cons.some((c) => c.to === i.name)) {
+      return {
+        ...i,
+        connected: true
+      };
+    }
+
+    return i;
+  });
+
+  const consOut = connections.filter((c) => c.from_node === nid);
+  const processedOutputs = outputs.map((i) => {
+    // Find if any outputs match this one:
+    if (consOut.some((c) => c.from === i.name)) {
+      return {
+        ...i,
+        connected: true
+      };
+    }
+
+    return i;
+  });
 
   return (
     <div onDoubleClick={(e) => handleClick(e)} ref={ref}>
@@ -114,17 +136,19 @@ const Node = ({
           </header>
           <div className="node-content">
             <NodeInputList
-              items={inputs}
+              items={processedInputs}
               onCompleteConnector={(idx) => handleOnCompleteConnector(idx)}
             />
             <NodeOutputList
-              items={outputs}
+              items={processedOutputs}
               onStartConnector={(idx) => handleOnStartConnector(idx)}
             />
           </div>
-          <div>
-            <canvas width="128" height="128" ref={canvasRef} />
-          </div>
+          {hasImageModule && (
+            <div>
+              <canvas width="128" height="128" ref={canvasRef} />
+            </div>
+          )}
         </section>
       </Draggable>
     </div>

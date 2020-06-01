@@ -17,12 +17,15 @@ export const NodeOutputListItem = ({
     e.preventDefault();
   };
 
+  // eslint-disable-next-line no-nested-ternary
+  const cls = item.connected ? 'fa fa-circle' : 'fa fa-circle-o';
+
   return (
     // eslint-disable-next-line jsx-a11y/no-noninteractive-element-interactions
     <li onMouseDown={handleOnMouseDown}>
       <button type="button" onClick={noop}>
         { item.name }
-        <i className="fa fa-circle-o" />
+        <i className={cls} />
       </button>
     </li>
   );

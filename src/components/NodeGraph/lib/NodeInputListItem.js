@@ -28,11 +28,14 @@ export const NodeInputListItem = ({
     e.preventDefault();
   };
 
+  // eslint-disable-next-line no-nested-ternary
+  const cls = item.connected ? (hover ? 'fa fa-circle hover' : 'fa fa-circle') : (hover ? 'fa fa-circle-o hover' : 'fa fa-circle-o');
+
   return (
     <li>
       <button onClick={noop} onMouseUp={handleOnMouseUp} type="button">
         <i
-          className={hover ? 'fa fa-circle-o hover' : 'fa fa-circle-o'}
+          className={cls}
           onMouseOver={onMouseOver}
           onMouseOut={onMouseOut}
         />

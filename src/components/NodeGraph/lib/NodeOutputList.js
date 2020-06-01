@@ -10,16 +10,14 @@ export const NodeOutputList = ({
     onStartConnector(i);
   };
 
-  let i = 0;
-
   return (
     <div className="nodeOutputWrapper">
       <ul className="nodeOutputList">
-        {items.map((item) => (
+        {items.map((item, i) => (
           <NodeOutputListItem
             onMouseDown={() => onMouseDown(i)}
-            key={i}
-            index={i++}
+            key={item.name}
+            index={i}
             item={item}
           />
         ))}

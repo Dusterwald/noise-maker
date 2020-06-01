@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { computeOutOffsetByIndex, computeInOffsetByIndex } from './lib/util';
 import Spline from './lib/Spline';
-import DragNode from './lib/Node';
+import Node from './lib/Node';
 import './node.css';
 
 const NodeGraph = ({
@@ -104,6 +104,7 @@ const NodeGraph = ({
 
   // console.log(dragging);
   if (dragging) {
+    // console.log(source);
     const sourceNode = getNodeById(dataS.nodes, source[0]);
     const connectorStart = computeOutOffsetByIndex(sourceNode.x, sourceNode.y, source[1]);
     const connectorEnd = {
@@ -121,6 +122,7 @@ const NodeGraph = ({
   }
 
   let splineIdx = 0;
+  console.log(dataS);
 
   return (
     <div
@@ -129,7 +131,7 @@ const NodeGraph = ({
       onMouseUp={onMouseUp}
     >
       {dataS.nodes.map((node) => (
-        <DragNode
+        <Node
           index={i++}
           nid={node.nid}
           title={node.type}
@@ -137,6 +139,8 @@ const NodeGraph = ({
           outputs={node.fields.out}
           pos={{ x: node.x, y: node.y }}
           key={node.nid}
+          connections={data.connections}
+          module={node.module}
 
           onNodeStart={(nid) => handleNodeStart(nid)}
           onNodeStop={(nid, pos) => handleNodeStop(nid, pos)}
