@@ -20,7 +20,8 @@ const Node = ({
   pos,
   connections,
   title,
-  module
+  module,
+  type
 }) => {
   const [selected, setSelected] = useState(false);
 
@@ -120,6 +121,8 @@ const Node = ({
     return i;
   });
 
+  const headerClass = `node-header node-header-${type}`;
+
   return (
     <div onDoubleClick={(e) => handleClick(e)} ref={ref}>
       <Draggable
@@ -131,7 +134,7 @@ const Node = ({
         nodeRef={nodeRef}
       >
         <section className={nodeClass} style={{ zIndex: 10000 }} ref={nodeRef}>
-          <header className="node-header">
+          <header className={headerClass}>
             <span className="node-title">{title}</span>
           </header>
           <div className="node-content">

@@ -134,13 +134,14 @@ const NodeGraph = ({
         <Node
           index={i++}
           nid={node.nid}
-          title={node.type}
+          title={node.name}
           inputs={node.fields.in}
           outputs={node.fields.out}
           pos={{ x: node.x, y: node.y }}
           key={node.nid}
           connections={data.connections}
           module={node.module}
+          type={node.type}
 
           onNodeStart={(nid) => handleNodeStart(nid)}
           onNodeStop={(nid, pos) => handleNodeStop(nid, pos)}
