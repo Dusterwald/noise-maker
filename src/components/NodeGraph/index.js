@@ -41,6 +41,12 @@ const NodeGraph = ({
     setDragging(false);
   };
 
+  const onContextMenu = (e) => {
+    e.stopPropagation();
+    e.preventDefault();
+    console.log('Right click');
+  }
+
   const handleNodeStart = (nid) => {
     // eslint-disable-next-line no-unused-expressions
     onNodeStartMove?.(nid);
@@ -122,13 +128,14 @@ const NodeGraph = ({
   }
 
   let splineIdx = 0;
-  console.log(dataS);
+  //console.log(dataS);
 
   return (
     <div
       className={dragging ? 'dragging' : ''}
       onMouseMove={onMouseMove}
       onMouseUp={onMouseUp}
+      onContextMenu={onContextMenu}
     >
       {dataS.nodes.map((node) => (
         <Node
