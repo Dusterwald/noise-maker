@@ -1,4 +1,5 @@
 import React, { useState, useRef } from 'react';
+import { Perlin } from 'libnoise-ts/module/generator';
 import { ScaleBias } from 'libnoise-ts/module/modifier';
 import { computeOutOffsetByIndex, computeInOffsetByIndex } from './lib/util';
 import Spline from './lib/Spline';
@@ -14,12 +15,20 @@ const NodeGraph = ({
   const [source, setSource] = useState([]);
   const [dragging, setDragging] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+  const [nodeId, setNodeId] = useState(10);
 
   const svgRef = useRef();
 
   const computePinIdxfromLabel = (pins, pinLabel) => pins.findIndex((x) => x.name === pinLabel);
 
   const getNodeById = (n, nid) => n.find((x) => x.nid === nid);
+
+  const addNode = (node) => {
+    setNodes([
+      ...nodes,
+      node
+    ]);
+  };
 
   const onMouseMove = (e) => {
     const [pX, pY] = [e.clientX, e.clientY];
@@ -41,7 +50,17 @@ const NodeGraph = ({
   const onContextMenu = (e) => {
     e.stopPropagation();
     e.preventDefault();
-    console.log('Right click');
+    console.log('Right click', e.clientX, e.clientY);
+    addNode({
+      nid: nodeId,
+      name: 'Perlin',
+      type: 'generator',
+      x: e.clientX,
+      y: e.clientY,
+      fields: { in: [], out: [{ name: 'out' }] },
+      module: new Perlin(0.25, 2.0, 4, 0.5, Math.random() * Number.MAX_SAFE_INTEGER)
+    });
+    setNodeId(nodeId + 1);
   };
 
   const handleNodeStart = (nid) => {
@@ -81,18 +100,20 @@ const NodeGraph = ({
 
   const handleCompleteConnector = (nid, inputIdx) => {
     if (dragging) {
-      const fromNode = getNodeById(data.nodes, source[0]);
+      const fromNode = getNodeById(nodes, source[0]);
       const fromPinName = fromNode.fields.out[source[1]].name;
-      const toNode = getNodeById(data.nodes, nid);
+      const toNode = getNodeById(nodes, nid);
       //console.log(toNode.fields, inputIdx);
       const toPinName = toNode.fields.in[inputIdx].name;
 
       // eslint-disable-next-line no-unused-expressions
       // onNewConnector?.(fromNode.nid, fromPinName, toNode.nid, toPinName);
+
       // Only try to create a connection if it isn't to the same node!
-      if (fromNode.nid !== toNode.nid) {
+      // Also check that there isn't already a connection going to that node
+      if (fromNode.nid !== toNode.nid && !connections.some((c) => c.to_node === toNode.nid && c.to === toPinName)) {
         if (toNode.name === 'Scale Bias Output') {
-          const module = new ScaleBias(fromNode.module);
+          const module = new ScaleBias(fromNode.module, 0.5, 0);
           const nNodes = [
             ...nodes.filter((n) => n.nid !== toNode.nid),
             {
@@ -118,6 +139,10 @@ const NodeGraph = ({
   const handleRemoveConnector = (connector) => {
     // eslint-disable-next-line no-unused-expressions
     // onRemoveConnector?.(connector);
+    // console.log(connector);
+    setConnections([
+      ...connections.filter((c) => c !== connector)
+    ]);
   };
 
   const handleNodeSelect = (nid) => {
