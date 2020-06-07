@@ -11,15 +11,14 @@ export const NodeInputList = ({
   };
   // console.log(items);
 
-  let i = 0;
   return (
     <div className="nodeInputWrapper">
       <ul className="nodeInputList">
-        {items.map((item) => (
+        {items.map((item, i) => (
           <NodeInputListItem
             onMouseUp={() => onMouseUp(i)}
-            key={i}
-            index={i++}
+            key={item.name}
+            index={i}
             item={item}
           />
         ))}

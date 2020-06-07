@@ -1,19 +1,16 @@
 import React, { useState, useRef } from 'react';
+import { ScaleBias } from 'libnoise-ts/module/modifier';
 import { computeOutOffsetByIndex, computeInOffsetByIndex } from './lib/util';
 import Spline from './lib/Spline';
 import Node from './lib/Node';
 import './node.css';
 
 const NodeGraph = ({
-  data,
-  onNodeDeselect,
-  onNodeMove,
-  onNodeStartMove,
-  onNodeSelect,
-  onNewConnector,
-  onRemoveConnector
+  data
 }) => {
-  const [dataS, setDataS] = useState(data);
+  // const [dataS, setDataS] = useState(data);
+  const [nodes, setNodes] = useState(data?.nodes);
+  const [connections, setConnections] = useState(data?.connections);
   const [source, setSource] = useState([]);
   const [dragging, setDragging] = useState(false);
   const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
@@ -22,7 +19,7 @@ const NodeGraph = ({
 
   const computePinIdxfromLabel = (pins, pinLabel) => pins.findIndex((x) => x.name === pinLabel);
 
-  const getNodeById = (nodes, nid) => nodes.find((x) => x.nid === nid);
+  const getNodeById = (n, nid) => n.find((x) => x.nid === nid);
 
   const onMouseMove = (e) => {
     const [pX, pY] = [e.clientX, e.clientY];
@@ -45,29 +42,34 @@ const NodeGraph = ({
     e.stopPropagation();
     e.preventDefault();
     console.log('Right click');
-  }
+  };
 
   const handleNodeStart = (nid) => {
     // eslint-disable-next-line no-unused-expressions
-    onNodeStartMove?.(nid);
+    // onNodeStartMove?.(nid);
   };
 
   const handleNodeStop = (nid, pos) => {
     // eslint-disable-next-line no-unused-expressions
-    onNodeMove?.(nid, pos);
+    // onNodeMove?.(nid, pos);
   };
 
   const handleNodeMove = (idx, pos) => {
-    const dataT = dataS;
+    /* const dataT = dataS;
     dataT.nodes[idx].x = pos.x;
     dataT.nodes[idx].y = pos.y;
 
-    // console.log(dataT);
-    // console.log({...dataS,...dataT});
     setDataS((old) => ({
       ...old,
       ...dataT
-    }));
+    })); */
+    const mn = nodes[idx];
+    mn.x = pos.x;
+    mn.y = pos.y;
+    setNodes([
+      ...nodes.filter((n) => n.nid !== mn.nid),
+      mn
+    ]);
   };
 
   const handleStartConnector = (nid, outputIdx) => {
@@ -82,27 +84,50 @@ const NodeGraph = ({
       const fromNode = getNodeById(data.nodes, source[0]);
       const fromPinName = fromNode.fields.out[source[1]].name;
       const toNode = getNodeById(data.nodes, nid);
+      //console.log(toNode.fields, inputIdx);
       const toPinName = toNode.fields.in[inputIdx].name;
 
       // eslint-disable-next-line no-unused-expressions
-      onNewConnector?.(fromNode.nid, fromPinName, toNode.nid, toPinName);
+      // onNewConnector?.(fromNode.nid, fromPinName, toNode.nid, toPinName);
+      // Only try to create a connection if it isn't to the same node!
+      if (fromNode.nid !== toNode.nid) {
+        if (toNode.name === 'Scale Bias Output') {
+          const module = new ScaleBias(fromNode.module);
+          const nNodes = [
+            ...nodes.filter((n) => n.nid !== toNode.nid),
+            {
+              ...toNode,
+              module
+            }
+          ];
+          const nConnections = [
+            ...connections,
+            {
+              from_node: fromNode.nid, from: fromPinName, to_node: toNode.nid, to: toPinName
+            }
+          ];
+          setNodes(nNodes);
+          setConnections(nConnections);
+          console.log(nConnections);
+        }
+      }
     }
     setDragging(false);
   };
 
   const handleRemoveConnector = (connector) => {
     // eslint-disable-next-line no-unused-expressions
-    onRemoveConnector?.(connector);
+    // onRemoveConnector?.(connector);
   };
 
   const handleNodeSelect = (nid) => {
     // eslint-disable-next-line no-unused-expressions
-    onNodeSelect?.(nid);
+    // onNodeSelect?.(nid);
   };
 
   const handleNodeDeselect = (nid) => {
     // eslint-disable-next-line no-unused-expressions
-    onNodeDeselect?.(nid);
+    // onNodeDeselect?.(nid);
   };
 
   let newConn = null;
@@ -111,7 +136,7 @@ const NodeGraph = ({
   // console.log(dragging);
   if (dragging) {
     // console.log(source);
-    const sourceNode = getNodeById(dataS.nodes, source[0]);
+    const sourceNode = getNodeById(nodes, source[0]);
     const connectorStart = computeOutOffsetByIndex(sourceNode.x, sourceNode.y, source[1]);
     const connectorEnd = {
       x: mousePos.x,
@@ -137,7 +162,7 @@ const NodeGraph = ({
       onMouseUp={onMouseUp}
       onContextMenu={onContextMenu}
     >
-      {dataS.nodes.map((node) => (
+      {nodes.map((node) => (
         <Node
           index={i++}
           nid={node.nid}
@@ -146,7 +171,7 @@ const NodeGraph = ({
           outputs={node.fields.out}
           pos={{ x: node.x, y: node.y }}
           key={node.nid}
-          connections={data.connections}
+          connections={connections}
           module={node.module}
           type={node.type}
 
@@ -172,11 +197,11 @@ const NodeGraph = ({
         }}
         ref={svgRef}
       >
-        {data.connections.map((connector) => {
+        {connections.map((connector) => {
           // console.log(data);
           // console.log(connector);
-          const fromNode = getNodeById(data.nodes, connector.from_node);
-          const toNode = getNodeById(data.nodes, connector.to_node);
+          const fromNode = getNodeById(nodes, connector.from_node);
+          const toNode = getNodeById(nodes, connector.to_node);
 
           const splinestart = computeOutOffsetByIndex(fromNode.x, fromNode.y, computePinIdxfromLabel(fromNode.fields.out, connector.from));
           const splineend = computeInOffsetByIndex(toNode.x, toNode.y, computePinIdxfromLabel(toNode.fields.in, connector.to));
